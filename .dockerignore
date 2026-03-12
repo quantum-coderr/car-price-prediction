@@ -1,0 +1,29 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# Virtual environments
+venv/
+.env/
+
+# Git
+.git
+.gitignore
+
+# Notebooks
+*.ipynb
+
+# Data
+data/
+
+# Logs
+logs/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Docker
+Dockerfile
+.dockerignore
