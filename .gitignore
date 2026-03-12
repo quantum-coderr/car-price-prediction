@@ -15,9 +15,6 @@ __pycache__/
 logs/
 *.log
 
-# Models
-model/*.pkl
-*.pkl
 
 # OS generated files
 .DS_Store
