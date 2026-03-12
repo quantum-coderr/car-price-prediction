@@ -38,20 +38,60 @@ Run the training script to train the model and generate the next integer variant
 python train/train.py
 ```
 
-## How to Run Inference API
+## How to Run Inference API Locally
 
 Start the FastAPI server:
 
 ```bash
-uvicorn app.main:app --reload
+uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
 ```
 
-The API will be available at `http://127.0.0.1:8000`. 
+The API will be available at `http://127.0.0.1:8000`.
 Interactive documentation can be viewed at `http://127.0.0.1:8000/docs`.
+
+## How to Run with Docker
+
+The Docker image uses the production `Dockerfile` in this repository. It:
+
+* uses `python:3.12-slim`
+* installs dependencies from `requirements.txt`
+* copies only `app/` and `model/` into the image
+* creates `/app/logs`
+* runs the API as a non-root `appuser`
+* exposes port `8000`
+
+Build the image:
+
+```bash
+docker build -t car-price-prediction .
+```
+
+Run the container:
+
+```bash
+docker run --rm -p 8000:8000 car-price-prediction
+```
+
+Then open:
+
+* API: `http://127.0.0.1:8000`
+* Docs: `http://127.0.0.1:8000/docs`
+
+The container starts the API with:
+
+```bash
+uvicorn app.main:app --host 0.0.0.0 --port 8000
+```
+
+## Docker Notes
+
+The image is intended for inference only. The `Dockerfile` does not copy `train/` or `data/`, so model training should be done locally before building the image.
+
+Make sure the `model/` directory already contains a trained model file such as `model_v1.pkl` before running the container.
 
 ### Predict Endpoint Testing
 
-You can trace the successful payload resolution via `logs/app.log` after posting. 
+You can trace the successful payload resolution via `logs/app.log` after posting.
 
 ```bash
 curl -X 'POST' \
