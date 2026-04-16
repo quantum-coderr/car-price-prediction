@@ -2,6 +2,8 @@
 
 This project is a production-ready Machine Learning API for Car Price Prediction.
 
+Live API Demo: http://34.131.246.150/docs
+
 ## Key Features
 
 1. **Automated Model Versioning**: Training iterations are automatically captured sequentially (`model_v1.pkl`, `model_v2.pkl`).
@@ -107,3 +109,96 @@ curl -X 'POST' \
   "Model": "EncoreConvenience"
 }'
 ```
+
+## CI/CD Pipeline
+
+The project includes a **fully automated CI/CD pipeline** that builds, publishes, and deploys the API whenever new code is pushed to the `main` branch.
+
+### Pipeline Flow
+
+```
+git push
+   ↓
+GitHub Actions
+   ↓
+Build Docker Image
+   ↓
+Push Image to DockerHub
+   ↓
+Trigger Deploy Workflow
+   ↓
+SSH into GCP VM
+   ↓
+docker compose pull
+   ↓
+docker compose up -d
+   ↓
+Updated API running on server
+```
+
+### Build & Push Workflow (`.github/workflows/docker-build.yml`)
+
+Triggered on every push to `main`.
+
+Responsibilities:
+
+* Checkout the repository
+* Login to DockerHub using repository secrets
+* Build the Docker image
+* Tag the image with:
+  * `latest`
+  * the commit SHA
+* Push both tags to DockerHub
+
+Example tags:
+
+```
+quantumcoderr/car-price-api:latest
+quantumcoderr/car-price-api:<commit_sha>
+```
+
+### Deploy Workflow (`.github/workflows/deploy.yml`)
+
+Runs **only after the build workflow completes successfully** using the `workflow_run` trigger.
+
+Deployment steps:
+
+1. GitHub Actions connects to the GCP VM using SSH.
+2. The VM pulls the latest Docker image from DockerHub.
+3. Docker Compose recreates the container with the updated image.
+
+Commands executed on the server:
+
+```bash
+cd app
+docker compose pull
+docker compose up -d
+```
+
+### Required GitHub Secrets
+
+| Secret | Description |
+|---|---|
+| `DOCKER_USERNAME` | DockerHub username |
+| `DOCKER_PASSWORD` | DockerHub password or access token |
+| `VM_HOST` | GCP VM public IP address |
+| `VM_USER` | SSH username for the VM |
+| `VM_SSH_KEY` | Private SSH key for VM access |
+
+### Deployment Result
+
+New code is automatically deployed without manual intervention.
+
+```
+Developer Push
+     ↓
+CI builds Docker image
+     ↓
+Image pushed to DockerHub
+     ↓
+Server pulls latest image
+     ↓
+Container updated automatically
+```
+
+This setup enables **continuous delivery of the ML inference API** with minimal operational overhead.
