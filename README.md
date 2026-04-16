@@ -66,7 +66,7 @@ Build the image:
 docker build -t car-price-prediction .
 ```
 
-Run the container:
+Run the container with these cmds:
 
 ```bash
 docker run --rm -p 8000:8000 car-price-prediction
