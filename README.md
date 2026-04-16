@@ -2,6 +2,8 @@
 
 This project is a production-ready Machine Learning API for Car Price Prediction.
 
+Live API Demo: http://34.131.246.150/docs
+
 ## Key Features
 
 1. **Automated Model Versioning**: Training iterations are automatically captured sequentially (`model_v1.pkl`, `model_v2.pkl`).
